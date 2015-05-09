@@ -116,7 +116,7 @@ class ImapDriver implements IDriver
 	 */
 	public function createMailbox($name)
 	{
-		if(!imap_createmailbox($this->resource, $name)) {
+		if(!imap_createmailbox($this->resource, $this->server . $this->encodeMailboxName($name))) {
 			throw new DriverException("Cannot create mailbox '$name': " . imap_last_error());
 		}
 	}
@@ -158,7 +158,7 @@ class ImapDriver implements IDriver
 	{
 		if($name !== $this->currentMailbox) {
 			$this->flush();
-			if(!imap_reopen($this->resource, $name)) {
+			if(!imap_reopen($this->resource, $this->server . $name)) {
 				throw new DriverException("Cannot switch to mailbox '$name': " . imap_last_error());
 			}
 			$this->currentMailbox = $name;
@@ -381,7 +381,7 @@ class ImapDriver implements IDriver
 	 * @throws DriverException
 	 */
 	public function copyMail($mailId, $toMailbox) {
-		if(!imap_mail_copy($this->resource, $mailId, $this->server . $this->encodeMailboxName($toMailbox), CP_UID)) {
+		if(!imap_mail_copy($this->resource, $mailId, $this->encodeMailboxName($toMailbox), CP_UID)) {
 			throw new DriverException("Cannot copy mail to mailbox '$toMailbox': ".imap_last_error());
 		}
 	}
@@ -393,7 +393,7 @@ class ImapDriver implements IDriver
 	 * @throws DriverException
 	 */
 	public function moveMail($mailId, $toMailbox) {
-		if(!imap_mail_move($this->resource, $mailId, $this->server . $this->encodeMailboxName($toMailbox), CP_UID)) {
+		if(!imap_mail_move($this->resource, $mailId, $this->encodeMailboxName($toMailbox), CP_UID)) {
 			throw new DriverException("Cannot copy mail to mailbox '$toMailbox': ".imap_last_error());
 		}
 	}
